@@ -1,0 +1,23 @@
+# Web Framework & API
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+
+# Database (ORM)
+sqlalchemy==2.0.30
+
+# Validation & Environment Variables
+pydantic==2.7.1
+pydantic-settings==2.2.1
+python-dotenv==1.0.1
+
+# HTTP Client (CoinGecko API)
+httpx==0.27.0
+
+# Scheduler (Background Tasks)
+apscheduler==3.10.4
+
+# Email Templating
+jinja2==3.1.4
+
+# Testing
+pytest==8.2.0
