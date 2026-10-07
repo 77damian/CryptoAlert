@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoAlert Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; padding-top: 20px; }
+        .card { box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 class="mb-4 text-center">🔔 CryptoAlert Dashboard</h1>
+    
+    <ul class="nav nav-pills mb-4 justify-content-center" id="pills-tab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="pills-dashboard-tab" data-bs-toggle="pill" data-bs-target="#pills-dashboard" type="button" role="tab" aria-selected="true">📈 Dashboard</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pills-alerts-tab" data-bs-toggle="pill" data-bs-target="#pills-alerts" type="button" role="tab" aria-selected="false">🔔 Alerty</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pills-admin-tab" data-bs-toggle="pill" data-bs-target="#pills-admin" type="button" role="tab" aria-selected="false">⚙️ Zarządzanie</button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="pills-tabContent">
+        <!-- Dashboard Tab -->
+        <div class="tab-pane fade show active" id="pills-dashboard" role="tabpanel">
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Aktualne Ceny</h5>
+                    <button class="btn btn-sm btn-light" onclick="fetchPrices()">Odśwież</button>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped" id="coins-table">
+                        <thead>
+                            <tr>
+                                <th>Moneta</th>
+                                <th>Symbol</th>
+                                <th>Aktualna Cena</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Zawartość ładowana przez JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alerts Tab -->
+        <div class="tab-pane fade" id="pills-alerts" role="tabpanel">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header bg-success text-white">Dodaj Alert</div>
+                        <div class="card-body">
+                            <form id="add-alert-form">
+                                <div class="mb-3">
+                                    <label>User ID</label>
+                                    <input type="number" id="alert-user-id" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label>Moneta</label>
+                                    <select id="alert-coin-id" class="form-select" required></select>
+                                </div>
+                                <div class="mb-3">
+                                    <label>Warunek</label>
+                                    <select id="alert-condition" class="form-select" required>
+                                        <option value="price_below">Cena spadnie poniżej</option>
+                                        <option value="price_above">Cena wzrośnie powyżej</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label>Wartość Docelowa ($)</label>
+                                    <input type="number" step="0.01" id="alert-target-value" class="form-control" required>
+                                </div>
+                                <button type="submit" class="btn btn-success w-100">Dodaj</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header bg-success text-white">Twoje Alerty</div>
+                        <div class="card-body">
+                            <table class="table table-striped" id="alerts-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>User ID</th>
+                                        <th>Moneta ID</th>
+                                        <th>Warunek</th>
+                                        <th>Wartość</th>
+                                        <th>Akcje</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Zawartość ładowana przez JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Tab -->
+        <div class="tab-pane fade" id="pills-admin" role="tabpanel">
+            <div class="row">
+                <!-- Krypto Management -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">Zarządzaj Monetami</div>
+                        <div class="card-body">
+                            <form id="add-coin-form" class="mb-4">
+                                <h6>Dodaj Monetę</h6>
+                                <div class="input-group">
+                                    <input type="text" id="coin-symbol" class="form-control" placeholder="Symbol (np. BTC)" required>
+                                    <input type="text" id="coin-name" class="form-control" placeholder="Nazwa" required>
+                                    <input type="text" id="coin-cg-id" class="form-control" placeholder="CoinGecko ID" required>
+                                    <button type="submit" class="btn btn-dark">Dodaj</button>
+                                </div>
+                            </form>
+                            <table class="table table-sm" id="admin-coins-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Symbol</th>
+                                        <th>CoinGecko ID</th>
+                                        <th>Akcje</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- User Management -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">Zarządzaj Użytkownikami</div>
+                        <div class="card-body">
+                            <form id="add-user-form" class="mb-4">
+                                <h6>Dodaj Użytkownika</h6>
+                                <div class="input-group">
+                                    <input type="email" id="user-email" class="form-control" placeholder="Email" required>
+                                    <button type="submit" class="btn btn-dark">Dodaj</button>
+                                </div>
+                            </form>
+                            <table class="table table-sm" id="admin-users-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Email</th>
+                                        <th>Akcje</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>

@@ -25,6 +25,12 @@ class UserResponse(BaseModel):
 # SCHEMATY MONET (COIN)
 # ----------------------------------------
 
+class CoinCreate(BaseModel):
+    """Dane wymagane przy dodawaniu nowej monety"""
+    symbol: str
+    name: str
+    coingecko_id: str
+
 class CoinResponse(BaseModel):
     """Dane monety odsyłane w odpowiedzi API"""
     id: int
@@ -35,6 +41,10 @@ class CoinResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class CoinWithPriceResponse(CoinResponse):
+    """Dane monety wzbogacone o ostatnią znaną cenę"""
+    latest_price: Optional[float] = None
 
 
 # ----------------------------------------
