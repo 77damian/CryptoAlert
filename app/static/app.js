@@ -24,21 +24,21 @@ async function fetchUsers() {
 async function fetchPrices() {
     try {
         await fetch(`${API_URL}/fetch-prices`, { method: 'POST' });
-        alert('Zaktualizowano ceny w bazie danych!');
+        alert('Updated prices in the database!');
     } catch (error) {
         console.error("Error fetching prices:", error);
     }
 }
 
 async function deleteCoin(id) {
-    if(confirm('Na pewno usunąć?')) {
+    if(confirm('Are you sure you want to delete?')) {
         await fetch(`${API_URL}/coins/${id}`, { method: 'DELETE' });
         fetchCoins();
     }
 }
 
 async function deleteUser(id) {
-    if(confirm('Na pewno usunąć użytkownika?')) {
+    if(confirm('Are you sure you want to delete the user?')) {
         await fetch(`${API_URL}/users/${id}`, { method: 'DELETE' });
         fetchUsers();
     }
@@ -57,7 +57,7 @@ function renderCoins(coins) {
                 <td>${coin.name}</td>
                 <td><span class="badge bg-secondary">${coin.symbol}</span></td>
                 <td>
-                    <strong>${coin.latest_price ? '$' + coin.latest_price.toFixed(2) : 'Brak danych'}</strong>
+                    <strong>${coin.latest_price ? '$' + coin.latest_price.toFixed(2) : 'No data'}</strong>
                 </td>
             </tr>
         `;
@@ -68,7 +68,7 @@ function renderCoins(coins) {
                 <td>${coin.id}</td>
                 <td>${coin.symbol}</td>
                 <td>${coin.coingecko_id}</td>
-                <td><button class="btn btn-sm btn-danger" onclick="deleteCoin(${coin.id})">Usuń</button></td>
+                <td><button class="btn btn-sm btn-danger" onclick="deleteCoin(${coin.id})">Delete</button></td>
             </tr>
         `;
     });
@@ -82,7 +82,7 @@ function renderUsers(users) {
             <tr>
                 <td>${user.id}</td>
                 <td>${user.email}</td>
-                <td><button class="btn btn-sm btn-danger" onclick="deleteUser(${user.id})">Usuń</button></td>
+                <td><button class="btn btn-sm btn-danger" onclick="deleteUser(${user.id})">Delete</button></td>
             </tr>
         `;
     });
@@ -133,7 +133,7 @@ document.getElementById('add-user-form').addEventListener('submit', async (e) =>
 });
 
 // ----------------------------------------------------
-// ALERTY - Logika pobierania, dodawania i usuwania
+// ALERTS - Fetching, adding, and deleting logic
 // ----------------------------------------------------
 
 async function fetchAlerts() {
@@ -147,7 +147,7 @@ async function fetchAlerts() {
 }
 
 async function deleteAlert(id) {
-    if(confirm('Na pewno usunąć ten alert?')) {
+    if(confirm('Are you sure you want to delete this alert?')) {
         await fetch(`${API_URL}/alerts/${id}`, { method: 'DELETE' });
         fetchAlerts();
     }
@@ -157,12 +157,12 @@ function renderAlerts(alerts) {
     const tableBody = document.querySelector('#alerts-table tbody');
     tableBody.innerHTML = '';
     
-    // Mapowanie technicznych nazw na polskie (dla czytelności)
+    // Mapping technical names to English (for readability)
     const conditionMap = {
-        'price_below': 'Cena poniżej',
-        'price_above': 'Cena powyżej',
-        'change_24h_below': 'Spadek 24h poniżej',
-        'change_24h_above': 'Wzrost 24h powyżej'
+        'price_below': 'Price below',
+        'price_above': 'Price above',
+        'change_24h_below': '24h drop below',
+        'change_24h_above': '24h rise above'
     };
 
     alerts.forEach(alert => {
@@ -176,13 +176,13 @@ function renderAlerts(alerts) {
                 <td><span class="badge bg-secondary">${coinName}</span></td>
                 <td>${conditionText}</td>
                 <td><strong>${alert.target_value}</strong></td>
-                <td><button class="btn btn-sm btn-danger" onclick="deleteAlert(${alert.id})">Usuń</button></td>
+                <td><button class="btn btn-sm btn-danger" onclick="deleteAlert(${alert.id})">Delete</button></td>
             </tr>
         `;
     });
 }
 
-// Obsługa formularza dodawania alertu
+// Handling the add alert form
 document.getElementById('add-alert-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const payload = {
@@ -201,18 +201,18 @@ document.getElementById('add-alert-form').addEventListener('submit', async (e) =
         
         if (response.ok) {
             e.target.reset();
-            fetchAlerts(); // Odśwież listę alertów
-            alert("Dodano nowy alert!");
+            fetchAlerts(); // Refresh the alerts list
+            alert("New alert added!");
         } else {
             const errorData = await response.json();
-            alert("Błąd: " + errorData.detail);
+            alert("Error: " + errorData.detail);
         }
     } catch (error) {
         console.error("Error creating alert:", error);
     }
 });
 
-// Init - uruchamiane po załadowaniu strony
+// Init - runs after page load
 window.onload = () => {
     fetchCoins();
     fetchUsers();

@@ -6,22 +6,22 @@ from app.database import Base
 
 
 class Coin(Base):
-    """Słownik kryptowalut monitorowanych w aplikacji"""
+    """Dictionary of cryptocurrencies monitored in the application"""
     __tablename__ = "coins"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    symbol: Mapped[str] = mapped_column(String(20), unique=True, index=True)      # np. BTC
-    name: Mapped[str] = mapped_column(String(100))                                 # np. Bitcoin
-    coingecko_id: Mapped[str] = mapped_column(String(100), unique=True)           # np. bitcoin
+    symbol: Mapped[str] = mapped_column(String(20), unique=True, index=True)      # e.g. BTC
+    name: Mapped[str] = mapped_column(String(100))                                 # e.g. Bitcoin
+    coingecko_id: Mapped[str] = mapped_column(String(100), unique=True)           # e.g. bitcoin
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
-    # Relacje
+    # Relationships
     prices: Mapped[List["Price"]] = relationship("Price", back_populates="coin", cascade="all, delete-orphan")
     alerts: Mapped[List["Alert"]] = relationship("Alert", back_populates="coin", cascade="all, delete-orphan")
 
 
 class Price(Base):
-    """Historia pomiarów cen kryptowalut"""
+    """History of cryptocurrency price measurements"""
     __tablename__ = "prices"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
@@ -32,12 +32,12 @@ class Price(Base):
     volume_24h: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     recorded_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
 
-    # Relacje
+    # Relationships
     coin: Mapped["Coin"] = relationship("Coin", back_populates="prices")
 
 
 class User(Base):
-    """Użytkownicy/subskrybenci alertów"""
+    """Users/subscribers of alerts"""
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
@@ -45,13 +45,13 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
-    # Relacje
+    # Relationships
     alerts: Mapped[List["Alert"]] = relationship("Alert", back_populates="user", cascade="all, delete-orphan")
     notifications: Mapped[List["Notification"]] = relationship("Notification", back_populates="user", cascade="all, delete-orphan")
 
 
 class Alert(Base):
-    """Warunki alertów ustawione przez użytkowników"""
+    """Alert conditions set by users"""
     __tablename__ = "alerts"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
@@ -64,7 +64,7 @@ class Alert(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
-    # Relacje
+    # Relationships
     user: Mapped["User"] = relationship("User", back_populates="alerts")
     coin: Mapped["Coin"] = relationship("Coin", back_populates="alerts")
     notifications: Mapped[List["Notification"]] = relationship("Notification", back_populates="alert", cascade="all, delete-orphan")
@@ -78,7 +78,7 @@ class Alert(Base):
 
 
 class Notification(Base):
-    """Historia wysłanych powiadomień e-mail (zapobiega spamowaniu)"""
+    """History of sent email notifications (prevents spamming)"""
     __tablename__ = "notifications"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
@@ -87,6 +87,6 @@ class Notification(Base):
     price_at_trigger: Mapped[float] = mapped_column(Float)
     sent_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
 
-    # Relacje
+    # Relationships
     alert: Mapped["Alert"] = relationship("Alert", back_populates="notifications")
     user: Mapped["User"] = relationship("User", back_populates="notifications")

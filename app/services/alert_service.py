@@ -5,22 +5,22 @@ from app.services.email_service import send_alert_email
 
 def check_and_trigger_alerts(db: Session):
     """
-    Sprawdza wszystkie aktywne alerty i uruchamia email service.
+    Checks all active alerts and triggers the email service when conditions are met.
     """
     active_alerts = db.query(Alert).filter(Alert.is_active == True).all()
     triggered_count = 0
 
     for alert in active_alerts:
-        # Pobieramy najnowszą cenę dla danej monety
+        # Fetch the latest price for this coin
         latest_price = db.query(Price)\
                          .filter(Price.coin_id == alert.coin_id)\
                          .order_by(Price.recorded_at.desc())\
                          .first()
-        
+
         if not latest_price:
             continue
 
-        # Sprawdzamy czy warunek alertu zachodzi
+        # Check whether the alert condition is met
         is_triggered = False
         current_price = latest_price.price_usd
         change_24h = latest_price.change_24h or 0.0
@@ -35,7 +35,7 @@ def check_and_trigger_alerts(db: Session):
             is_triggered = True
 
         if is_triggered:
-            # Sprawdzamy czy powiadomienie nie zostało już wysłane w ciągu ostatnich 24 godzin (antyspam)
+            # Check whether a notification was already sent in the last 24 hours (anti-spam)
             twenty_four_hours_ago = datetime.utcnow() - timedelta(hours=24)
             recent_notification = db.query(Notification)\
                                     .filter(Notification.alert_id == alert.id)\
@@ -43,7 +43,7 @@ def check_and_trigger_alerts(db: Session):
                                     .first()
 
             if not recent_notification:
-                # Wysyłamy e-mail
+                # Send the alert email
                 email_sent = send_alert_email(
                     to_email=alert.user.email,
                     coin_name=alert.coin.name,
@@ -55,7 +55,7 @@ def check_and_trigger_alerts(db: Session):
                 )
 
                 if email_sent:
-                    # Zapisujemy historię w tabeli notifications
+                    # Save the notification record to prevent spam
                     new_notif = Notification(
                         alert_id=alert.id,
                         user_id=alert.user_id,

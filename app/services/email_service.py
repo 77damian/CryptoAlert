@@ -4,7 +4,7 @@ from email.mime.multipart import MIMEMultipart
 from jinja2 import Template
 from app.config import settings
 
-# Szablon HTML wiadomości e-mail
+# HTML email template
 EMAIL_HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html>
@@ -36,7 +36,7 @@ EMAIL_HTML_TEMPLATE = """
 
 def send_alert_email(to_email: str, coin_name: str, symbol: str, current_price: float, condition: str, target_value: float, change_24h: float):
     """
-    Wysyła e-mail z alertem.
+    Sends an alert email to the specified recipient.
     """
     condition_text_map = {
         "price_above": ("went above", "Price above"),
@@ -46,7 +46,7 @@ def send_alert_email(to_email: str, coin_name: str, symbol: str, current_price: 
     }
     subject_text, body_text = condition_text_map.get(condition, (condition, condition))
 
-    # Renderujemy treść e-maila za pomocą Jinja2
+    # Render the email body using Jinja2
     template = Template(EMAIL_HTML_TEMPLATE)
     html_content = template.render(
         coin_name=coin_name,
@@ -59,8 +59,7 @@ def send_alert_email(to_email: str, coin_name: str, symbol: str, current_price: 
 
     subject = f"🚨 CryptoAlert: {symbol} {subject_text} {target_value}"
 
-
-    # wysyłka SMTP przez serwer pocztowy
+    # Send via SMTP
     try:
         msg = MIMEMultipart("alternative")
         msg["Subject"] = subject
@@ -70,7 +69,7 @@ def send_alert_email(to_email: str, coin_name: str, symbol: str, current_price: 
         html_part = MIMEText(html_content, "html", "utf-8")
         msg.attach(html_part)
 
-        # Bezpieczne połączenie z serwerem SMTP
+        # Establish a secure connection to the SMTP server
         server = smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT, timeout=15)
         server.ehlo()
         server.starttls()
@@ -78,9 +77,9 @@ def send_alert_email(to_email: str, coin_name: str, symbol: str, current_price: 
         server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
         server.sendmail(settings.SMTP_USER, to_email, msg.as_string())
         server.quit()
-        
-        print(f"Sukces: Wysłano e-mail do {to_email}")
+
+        print(f"Success: Email sent to {to_email}")
         return True
     except Exception as e:
-        print(f"Błąd wysyłania e-maila do {to_email}: {e}")
+        print(f"Error sending email to {to_email}: {e}")
         return False

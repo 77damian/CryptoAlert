@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from app.models.models import Coin, Price
 from app.fetcher.coingecko import fetch_prices_from_coingecko
 
-# Domyślna lista monet, które inicjalizujemy w systemie
+# Default list of coins seeded into the system on first run
 INITIAL_COINS = [
     {"symbol": "BTC", "name": "Bitcoin", "coingecko_id": "bitcoin"},
     {"symbol": "ETH", "name": "Ethereum", "coingecko_id": "ethereum"},
@@ -10,7 +10,7 @@ INITIAL_COINS = [
 ]
 
 def init_default_coins(db: Session):
-    """Dodaje domyślne monety do bazy danych, jeśli jeszcze ich nie ma"""
+    """Adds default coins to the database if they don't already exist"""
     for coin_data in INITIAL_COINS:
         existing = db.query(Coin).filter(Coin.symbol == coin_data["symbol"]).first()
         if not existing:
@@ -26,21 +26,21 @@ def init_default_coins(db: Session):
 
 async def fetch_and_save_prices(db: Session):
     """
-    1. Upewnia się, że monety są w bazie.
-    2. Pobiera ceny z API.
-    3. Zapisuje nowe rekordy w tabeli 'prices'.
+    1. Ensures that the default coins exist in the database.
+    2. Fetches current prices from the CoinGecko API.
+    3. Saves new price records to the 'prices' table.
     """
     init_default_coins(db)
 
-    # Pobieramy aktywne monety z bazy
+    # Fetch all active coins from the database
     active_coins = db.query(Coin).filter(Coin.is_active == True).all()
     if not active_coins:
         return []
 
-    # Wyciągamy identyfikatory CoinGecko (np. ['bitcoin', 'ethereum', 'solana'])
+    # Extract CoinGecko identifiers (e.g. ['bitcoin', 'ethereum', 'solana'])
     coingecko_ids = [coin.coingecko_id for coin in active_coins]
-    
-    # Pobieramy dane z zewnętrznego API
+
+    # Fetch data from the external API
     api_data = await fetch_prices_from_coingecko(coingecko_ids)
 
     saved_prices = []

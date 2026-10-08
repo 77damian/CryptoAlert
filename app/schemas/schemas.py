@@ -3,15 +3,15 @@ from typing import Optional, List
 from pydantic import BaseModel, EmailStr, Field
 
 # ----------------------------------------
-# SCHEMATY UŻYTKOWNIKA (USER)
+# USER SCHEMAS
 # ----------------------------------------
 
 class UserCreate(BaseModel):
-    """Dane wymagane przy rejestracji użytkownika"""
+    """Data required for user registration"""
     email: EmailStr
 
 class UserResponse(BaseModel):
-    """Dane użytkownika odsyłane w odpowiedzi API"""
+    """User data sent in API response"""
     id: int
     email: EmailStr
     is_active: bool
@@ -22,17 +22,17 @@ class UserResponse(BaseModel):
 
 
 # ----------------------------------------
-# SCHEMATY MONET (COIN)
+# COIN SCHEMAS
 # ----------------------------------------
 
 class CoinCreate(BaseModel):
-    """Dane wymagane przy dodawaniu nowej monety"""
+    """Data required when adding a new coin"""
     symbol: str
     name: str
     coingecko_id: str
 
 class CoinResponse(BaseModel):
-    """Dane monety odsyłane w odpowiedzi API"""
+    """Coin data sent in API response"""
     id: int
     symbol: str
     name: str
@@ -43,26 +43,26 @@ class CoinResponse(BaseModel):
         from_attributes = True
 
 class CoinWithPriceResponse(CoinResponse):
-    """Dane monety wzbogacone o ostatnią znaną cenę"""
+    """Coin data enriched with the last known price"""
     latest_price: Optional[float] = None
 
 
 # ----------------------------------------
-# SCHEMATY ALERTÓW (ALERT)
+# ALERT SCHEMAS
 # ----------------------------------------
 
 class AlertCreate(BaseModel):
-    """Dane wymagane przy tworzeniu nowego alertu"""
+    """Data required when creating a new alert"""
     user_id: int
     coin_id: int
     condition: str = Field(
         ..., 
-        description="Typ warunku: 'price_above', 'price_below', 'change_24h_above', 'change_24h_below'"
+        description="Condition type: 'price_above', 'price_below', 'change_24h_above', 'change_24h_below'"
     )
-    target_value: float = Field(..., description="Wartość progowa (np. 60000.0 dla USD lub 5.0 dla %)")
+    target_value: float = Field(..., description="Threshold value (e.g. 60000.0 for USD or 5.0 for %)")
 
 class AlertResponse(BaseModel):
-    """Dane alertu odsyłane w odpowiedzi API"""
+    """Alert data sent in API response"""
     id: int
     user_id: int
     coin_id: int

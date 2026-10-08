@@ -10,14 +10,14 @@ router = APIRouter(prefix="/coins", tags=["Coins"])
 @router.get("/", response_model=List[CoinWithPriceResponse])
 def list_coins(db: Session = Depends(get_db)):
     """
-    Pobranie listy wszystkich monitorowanych kryptowalut wraz z aktualną ceną
+    Get the list of all monitored cryptocurrencies along with the current price
     """
     coins = db.query(Coin).filter(Coin.is_active == True).all()
     result = []
     for coin in coins:
         latest_price = db.query(Price).filter(Price.coin_id == coin.id).order_by(Price.recorded_at.desc()).first()
         
-        # Tworzymy słownik z danych monety i dopisujemy cenę
+        # Create a dictionary with coin data and append the price
         coin_data = {
             "id": coin.id,
             "symbol": coin.symbol,
@@ -33,13 +33,13 @@ def list_coins(db: Session = Depends(get_db)):
 @router.get("/{coin_id}/prices")
 def get_coin_price_history(coin_id: int, limit: int = 20, db: Session = Depends(get_db)):
     """
-    Pobranie historii cen dla wybranej kryptowaluty
+    Get price history for a selected cryptocurrency
     """
     coin = db.query(Coin).filter(Coin.id == coin_id).first()
     if not coin:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Kryptowaluta o ID {coin_id} nie istnieje."
+            detail=f"Cryptocurrency with ID {coin_id} does not exist."
         )
 
     prices = db.query(Price)\
@@ -58,13 +58,13 @@ def get_coin_price_history(coin_id: int, limit: int = 20, db: Session = Depends(
 @router.post("/", response_model=CoinResponse, status_code=status.HTTP_201_CREATED)
 def create_coin(coin_in: CoinCreate, db: Session = Depends(get_db)):
     """
-    Dodanie nowej kryptowaluty do monitorowania
+    Add a new cryptocurrency for monitoring
     """
     existing_coin = db.query(Coin).filter(Coin.coingecko_id == coin_in.coingecko_id).first()
     if existing_coin:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Ta kryptowaluta jest już monitorowana."
+            detail="This cryptocurrency is already being monitored."
         )
     
     new_coin = Coin(
@@ -80,13 +80,13 @@ def create_coin(coin_in: CoinCreate, db: Session = Depends(get_db)):
 @router.delete("/{coin_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_coin(coin_id: int, db: Session = Depends(get_db)):
     """
-    Usuwanie kryptowaluty po ID
+    Delete a cryptocurrency by ID
     """
     coin = db.query(Coin).filter(Coin.id == coin_id).first()
     if not coin:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Nie znaleziono kryptowaluty."
+            detail="Cryptocurrency not found."
         )
     
     db.delete(coin)

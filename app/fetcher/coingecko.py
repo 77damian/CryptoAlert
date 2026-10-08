@@ -1,13 +1,13 @@
 import httpx
 from typing import Dict, Any, List
 
-# Adres REST API CoinGecko
+# Base URL of the CoinGecko REST API
 COINGECKO_API_URL = "https://api.coingecko.com/api/v3/simple/price"
 
 async def fetch_prices_from_coingecko(coin_ids: List[str]) -> Dict[str, Any]:
     """
-    Pobiera aktualne ceny dla podanych identyfikatorów monet (np. ['bitcoin', 'ethereum', 'solana'])
-    Zwraca słownik JSON z cenami w USD, zmianą 24h, kapitalizacją i wolumenem.
+    Fetches current prices for the given coin identifiers (e.g. ['bitcoin', 'ethereum', 'solana']).
+    Returns a JSON dictionary with USD prices, 24h change, market cap and volume.
     """
     ids_param = ",".join(coin_ids)
     params = {
