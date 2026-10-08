@@ -35,7 +35,7 @@ SMTP_PASSWORD="your_app_password"
 ### 3. Run the application
 
 ```bash
-uvicorn app.main:app --reload
+python -m uvicorn app.main:app --reload
 ```
 
 The app will be available at **[http://127.0.0.1:8000](http://127.0.0.1:8000)**
